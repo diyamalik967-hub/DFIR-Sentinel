@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b1220">
+<title>DFIR Sentinel | Digital Forensics & Incident Response</title>
+<style>
+:root{--bg:#08111f;--panel:#111d30;--panel2:#16243a;--line:#263750;--text:#e8eef8;--muted:#9aabc2;--blue:#55a6ff;--cyan:#54d5df;--red:#ff647c;--amber:#ffbf69;--green:#53d6a0}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#07101d,#0d1a2d 60%,#08111f);color:var(--text);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{padding:22px max(18px,calc((100vw - 1180px)/2));border-bottom:1px solid var(--line);background:#0b1628eF;position:sticky;top:0;z-index:3;backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#1676d2,#36c5ce);display:grid;place-items:center;font-weight:900;font-size:20px;color:#041321}
+h1{font-size:20px;margin:0;letter-spacing:.2px}.sub{color:var(--muted);font-size:12px}
+nav{display:flex;gap:8px;overflow:auto;padding-top:18px}nav button,.btn{border:1px solid var(--line);background:#14233a;color:var(--text);padding:10px 13px;border-radius:9px;cursor:pointer;white-space:nowrap;font-weight:600}nav button.active,.btn.primary{background:#1765ae;border-color:#3189dc}button:hover{filter:brightness(1.12)}
+main{max-width:1180px;margin:24px auto;padding:0 18px 50px}.view{display:none}.view.active{display:block}.heading{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:18px}h2{font-size:23px;margin:0 0 4px}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.card{background:linear-gradient(150deg,var(--panel),#0f1a2b);border:1px solid var(--line);border-radius:14px;padding:17px;min-width:0}.metric{font-size:30px;font-weight:750;margin:8px 0 0}.metric-label{font-size:13px;color:var(--muted)}.two{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;margin-top:14px}.section-title{font-size:16px;font-weight:700;margin:0 0 12px}.pill{display:inline-block;padding:3px 8px;border-radius:30px;font-size:11px;font-weight:700;background:#20344e;color:#b8d7f8}.critical{background:#4a1e2b;color:#ff9bad}.high{background:#49321b;color:#ffd094}.medium{background:#3d3a1e;color:#f5e18b}.low{background:#173d35;color:#8fe7c2}
+input,select,textarea{width:100%;background:#091525;border:1px solid var(--line);border-radius:9px;padding:11px;color:var(--text);margin:6px 0 12px;font:inherit}label{font-size:13px;color:#c6d3e5;font-weight:600}textarea{min-height:86px;resize:vertical}.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.drop{border:1px dashed #47729d;padding:20px;border-radius:12px;background:#0c1a2c;text-align:center}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:10px 9px;border-bottom:1px solid var(--line);vertical-align:top}th{color:#9eb5d2;font-weight:650}td{color:#e0e9f5}.empty{padding:25px;text-align:center;color:var(--muted)}.notice{padding:12px 14px;border-radius:10px;background:#132b40;border:1px solid #285273;color:#c7e4ff;margin:12px 0;font-size:13px}.warning{background:#392a18;border-color:#76532b;color:#ffdaa4}.success{background:#12372d;border-color:#24654f;color:#a4f1d1}.bar{height:9px;background:#22344b;border-radius:20px;overflow:hidden}.bar span{display:block;height:100%;background:linear-gradient(90deg,#3288dc,#4ed4d3);width:0}.small{font-size:12px;color:var(--muted)}footer{text-align:center;color:#71839d;font-size:12px;padding:20px}
+@media(max-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.two{grid-template-columns:1fr}header{padding:14px 16px}main{margin:18px auto}.metric{font-size:25px}}
+@media(max-width:390px){.grid{grid-template-columns:1fr 1fr}.card{padding:13px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand"><div class="logo">DF</div><div><h1>DFIR SENTINEL</h1><div class="sub">DIGITAL FORENSICS & INCIDENT RESPONSE · ACADEMIC EDITION</div></div></div>
+ <nav>
+  <button class="active" data-view="dashboard">Dashboard</button><button data-view="logs">Log Analysis</button><button data-view="incidents">Incidents</button><button data-view="evidence">Evidence Vault</button><button data-view="reports">Reports</button><button data-view="about">About</button>
+ </nav>
+</header>
+<main>
+<section id="dashboard" class="view active">
+ <div class="heading"><div><h2>Security Overview</h2><div class="muted">A live summary of the log events analysed in this session.</div></div><button class="btn" onclick="loadDemo()">Load demo data</button></div>
+ <div class="grid">
+  <div class="card"><div class="metric-label">Events analysed</div><div class="metric" id="mEvents">0</div></div>
+  <div class="card"><div class="metric-label">Potential incidents</div><div class="metric" id="mIncidents">0</div></div>
+  <div class="card"><div class="metric-label">Suspicious IPs</div><div class="metric" id="mIps">0</div></div>
+  <div class="card"><div class="metric-label">Evidence items</div><div class="metric" id="mEvidence">0</div></div>
+ </div>
+ <div class="two">
+  <div class="card"><div class="section-title">Incident severity</div><div id="severityBars"></div></div>
+  <div class="card"><div class="section-title">Detection summary</div><div id="summary" class="muted">No data analysed yet. Load the demo dataset or upload a log file.</div></div>
+ </div>
+ <div class="card" style="margin-top:14px"><div class="section-title">Latest detected incidents</div><div id="latestIncidents" class="empty">No incidents to display.</div></div>
+ <div class="notice">Educational simulation: alerts are generated from transparent rules applied to uploaded log data. A detection is an indicator for investigation, not proof of malicious activity.</div>
+</section>
+<section id="logs" class="view">
+ <div class="heading"><div><h2>Log Analysis</h2><div class="muted">Upload a CSV or TXT file with authentication events.</div></div></div>
+ <div class="card">
+  <div class="drop"><b>Choose a security log file</b><p class="small">CSV columns supported: timestamp, ip, username, event or status. TXT lines may contain timestamp, IP, username and failed/successful status.</p><input id="logFile" type="file" accept=".csv,.txt,text/csv,text/plain"></div>
+  <div class="actions"><button class="btn primary" onclick="analyseUpload()">Analyse uploaded file</button><button class="btn" onclick="loadDemo()">Use sample dataset</button><button class="btn" onclick="downloadSample()">Download sample CSV</button></div>
+  <div id="uploadMsg" class="small"></div>
+ </div>
+ <div class="card" style="margin-top:14px"><div class="section-title">Analysed events</div><div class="table-wrap" id="eventsTable"><div class="empty">Upload a log or load demo data to begin.</div></div></div>
+ <div class="notice warning">Detection rule: 5 or more failed login attempts from the same IP address within the uploaded dataset create a high-severity potential brute-force incident. This simple educational rule does not establish that an attack occurred.</div>
+</section>
+<section id="incidents" class="view">
+ <div class="heading"><div><h2>Incident Management</h2><div class="muted">Review, classify and track potential security incidents.</div></div><button class="btn" onclick="exportIncidents()">Export incidents CSV</button></div>
+ <div class="card"><div class="table-wrap" id="incidentTable"><div class="empty">No incidents yet. Analyse a log file first.</div></div></div>
+</section>
+<section id="evidence" class="view">
+ <div class="heading"><div><h2>Digital Evidence Vault</h2><div class="muted">Register files and calculate SHA-256 integrity hashes.</div></div></div>
+ <div class="card">
+  <label>Select an evidence file</label><input type="file" id="evidenceFile">
+  <label>Evidence description</label><input id="evidenceDesc" placeholder="e.g. Acquired authentication log from test system">
+  <div class="actions"><button class="btn primary" onclick="addEvidence()">Calculate hash & register evidence</button></div>
+  <div id="hashMsg" class="small"></div>
+ </div>
+ <div class="card" style="margin-top:14px"><div class="section-title">Evidence register</div><div class="table-wrap" id="evidenceTable"><div class="empty">No evidence registered.</div></div></div>
+ <div class="notice">SHA-256 creates a digital fingerprint of the selected file. Matching hashes support integrity verification; they do not prove who created a file or whether it is authentic. This browser demo does not provide forensic-grade write blocking or chain-of-custody controls.</div>
+</section>
+<section id="reports" class="view">
+ <div class="heading"><div><h2>Investigation Reports</h2><div class="muted">Create a printable summary of the current analysis.</div></div></div>
+ <div class="card">
+  <label>Investigator / student name</label><input id="investigator" placeholder="Enter your name">
+  <label>Case reference</label><input id="caseRef" placeholder="e.g. DFIR-2026-001">
+  <label>Investigation notes</label><textarea id="notes" placeholder="Record what was reviewed, findings, limitations and recommended next steps."></textarea>
+  <div class="actions"><button class="btn primary" onclick="printReport()">Generate / Print report (Save as PDF)</button><button class="btn" onclick="exportEvents()">Download events CSV</button></div>
+  <div class="notice">On iPhone: use the print preview's Share button, then Save to Files or share as PDF. The report includes current session data only.</div>
+ </div>
+</section>
+<section id="about" class="view">
+ <div class="heading"><div><h2>About this project</h2><div class="muted">Project synopsis and operating limitations.</div></div></div>
+ <div class="card">
+  <h3>DFIR Sentinel — Digital Forensics and Incident Response System</h3>
+  <p>This academic prototype demonstrates a basic DFIR workflow: ingesting authorised security logs, applying transparent detection rules, registering evidence, calculating SHA-256 hashes and preparing an investigation report.</p>
+  <h3>Objectives</h3><ul><li>Analyse security log records.</li><li>Identify repeated failed login attempts and potential brute-force activity.</li><li>Track incidents and investigation status.</li><li>Calculate SHA-256 hashes for evidence integrity checks.</li><li>Generate a report for documentation.</li></ul>
+  <h3>Technology</h3><p>HTML, CSS and JavaScript with the browser File API and Web Crypto SHA-256 interface. This self-contained version requires no server, account or paid subscription.</p>
+  <h3>Important limitations</h3><p>This is a demonstration tool, not a commercial forensic suite. It does not monitor a device live, inspect iOS internals, perform memory forensics, enrich IP reputation from the internet, or preserve court-grade chain of custody. Use only data you own or are authorised to analyse. All analysis is performed locally in the browser; uploaded files are not sent to a server.</p>
+ </div>
+</section>
+</main>
+<footer>DFIR Sentinel Academic Edition · Local browser processing · Use authorised test data only</footer>
+<script>
+let events=[], incidents=[], evidence=[], nextId=1;
+const $=id=>document.getElementById(id);
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.view).classList.add('active')}));
+function escapeHTML(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function normalise(row){let obj={};Object.keys(row).forEach(k=>obj[k.toLowerCase().trim().replace(/[\s-]+/g,'_')]=String(row[k]??'').trim());let status=(obj.status||obj.event||obj.action||'').toLowerCase();let failed=/fail|denied|invalid|error/.test(status);let success=/success|accepted|login_ok/.test(status);return {timestamp:obj.timestamp||obj.time||new Date().toISOString(),ip:obj.ip||obj.ip_address||obj.source_ip||'Unknown',username:obj.username||obj.user||'Unknown',status:failed?'Failed':success?'Success':(obj.status||obj.event||'Unknown'),failed,success}}
+function parseCSV(text){let lines=text.replace(/\r/g,'').split('\n').filter(x=>x.trim());if(lines.length<2)return [];let parseLine=line=>{let out=[],v='',q=false;for(let i=0;i<line.length;i++){let c=line[i];if(c==='"'&&line[i+1]==='"'&&q){v+='"';i++}else if(c==='"')q=!q;else if(c===','&&!q){out.push(v);v=''}else v+=c}out.push(v);return out};let heads=parseLine(lines[0]);return lines.slice(1).map(l=>{let vals=parseLine(l),o={};heads.forEach((h,i)=>o[h]=vals[i]||'');return o})}
+function parseTXT(text){return text.split(/\r?\n/).filter(Boolean).map(line=>{let ip=(line.match(/\b(?:\d{1,3}\.){3}\d{1,3}\b/)||[])[0]||'Unknown';let user=(line.match(/(?:user|username)[=: ]+([A-Za-z0-9_.-]+)/i)||[])[1]||'Unknown';let failed=/fail|denied|invalid|authentication error/i.test(line);let success=/success|accepted|logged in/i.test(line);return {timestamp:(line.match(/\d{4}-\d\d-\d\d[ T]\d\d:\d\d:\d\d/)||[])[0]||'',ip,username:user,status:failed?'Failed':success?'Success':'Unknown'}})}
+function analyseRows(rows){events=rows.map(normalise);let counts={};events.filter(e=>e.failed).forEach(e=>counts[e.ip]=(counts[e.ip]||0)+1);incidents=Object.entries(counts).filter(([ip,n])=>n>=5).map(([ip,n])=>({id:'INC-'+String(nextId++).padStart(3,'0'),type:'Possible brute-force login activity',ip,count:n,severity:n>=10?'Critical':'High',status:'Open',created:new Date().toLocaleString(),description:n+' failed login attempts from '+ip+' in the uploaded dataset.'}));renderAll();$('uploadMsg').textContent=`Analysed ${events.length} event(s); identified ${incidents.length} potential incident(s).`}
+function analyseUpload(){let f=$('logFile').files[0];if(!f){$('uploadMsg').textContent='Please select a CSV or TXT file first.';return}let r=new FileReader();r.onload=()=>{let rows=f.name.toLowerCase().endsWith('.txt')?parseTXT(r.result):parseCSV(r.result);if(!rows.length){$('uploadMsg').textContent='No records found. Check the file format and headers.';return}analyseRows(rows)};r.readAsText(f)}
+function loadDemo(){let demo=[['2026-10-30 09:00:01','192.0.2.10','alice','Success'],['2026-10-30 09:02:11','198.51.100.23','admin','Failed'],['2026-10-30 09:02:15','198.51.100.23','admin','Failed'],['2026-10-30 09:02:19','198.51.100.23','admin','Failed'],['2026-10-30 09:02:23','198.51.100.23','admin','Failed'],['2026-10-30 09:02:27','198.51.100.23','admin','Failed'],['2026-10-30 09:04:00','192.0.2.10','alice','Success'],['2026-10-30 09:05:00','203.0.113.7','bob','Failed'],['2026-10-30 09:06:00','203.0.113.7','bob','Success'],['2026-10-30 09:07:00','192.0.2.44','guest','Failed'],['2026-10-30 09:08:00','192.0.2.44','guest','Failed']];analyseRows(demo.map(a=>({timestamp:a[0],ip:a[1],username:a[2],status:a[3]})));$('uploadMsg').textContent='Loaded fictional demonstration data. Reserved documentation IP ranges are used.'}
+function renderAll(){ $('mEvents').textContent=events.length;$('mIncidents').textContent=incidents.length;$('mIps').textContent=new Set(incidents.map(i=>i.ip)).size;$('mEvidence').textContent=evidence.length;
+let sev=['Critical','High','Medium','Low'];$('severityBars').innerHTML=sev.map(s=>{let n=incidents.filter(i=>i.severity===s).length;return `<p style="display:flex;justify-content:space-between;margin:12px 0 5px"><span>${s}</span><b>${n}</b></p><div class="bar"><span style="width:${incidents.length?n/incidents.length*100:0}%"></span></div>`}).join('');
+$('summary').innerHTML=events.length?`<p><b>${events.filter(e=>e.failed).length}</b> failed login events</p><p><b>${events.filter(e=>e.success).length}</b> successful login events</p><p><b>${events.length-events.filter(e=>e.failed||e.success).length}</b> unclassified events</p><p class="small">Detection threshold: 5 failed attempts per IP.</p>`:'No data analysed yet.';
+$('latestIncidents').innerHTML=incidents.length?`<div class="table-wrap"><table><tr><th>Incident</th><th>Source IP</th><th>Severity</th><th>Status</th></tr>${incidents.slice(0,5).map(i=>`<tr><td>${i.type}</td><td>${escapeHTML(i.ip)}</td><td><span class="pill ${i.severity.toLowerCase()}">${i.severity}</span></td><td>${i.status}</td></tr>`).join('')}</table></div>`:'No incidents to display.';
+$('eventsTable').innerHTML=events.length?`<table><tr><th>Time</th><th>IP</th><th>User</th><th>Result</th></tr>${events.map(e=>`<tr><td>${escapeHTML(e.timestamp)}</td><td>${escapeHTML(e.ip)}</td><td>${escapeHTML(e.username)}</td><td>${escapeHTML(e.status)}</td></tr>`).join('')}</table>`:'<div class="empty">No events analysed.</div>';
+$('incidentTable').innerHTML=incidents.length?`<table><tr><th>ID / Type</th><th>IP / Attempts</th><th>Severity</th><th>Investigation status</th></tr>${incidents.map((i,idx)=>`<tr><td><b>${i.id}</b><br>${escapeHTML(i.type)}<div class="small">${escapeHTML(i.created)}</div></td><td>${escapeHTML(i.ip)}<br>${i.count} failed attempts</td><td><span class="pill ${i.severity.toLowerCase()}">${i.severity}</span></td><td><select onchange="incidents[${idx}].status=this.value"><option ${i.status==='Open'?'selected':''}>Open</option><option ${i.status==='Investigating'?'selected':''}>Investigating</option><option ${i.status==='Resolved'?'selected':''}>Resolved</option></select></td></tr>`).join('')}</table>`:'<div class="empty">No incidents yet.</div>';
+$('evidenceTable').innerHTML=evidence.length?`<table><tr><th>Evidence</th><th>File details</th><th>SHA-256</th></tr>${evidence.map(e=>`<tr><td><b>${e.id}</b><br>${escapeHTML(e.description)}</td><td>${escapeHTML(e.name)}<br>${e.size} bytes<br><span class="small">${escapeHTML(e.date)}</span></td><td style="word-break:break-all">${e.hash}</td></tr>`).join('')}</table>`:'<div class="empty">No evidence registered.</div>'}
+async function sha256(file){let buf=await file.arrayBuffer();if(!crypto.subtle)throw new Error('SHA-256 browser support is unavailable. Open this page in an up-to-date Safari browser.');let hash=await crypto.subtle.digest('SHA-256',buf);return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join('')}
+async function addEvidence(){let f=$('evidenceFile').files[0];if(!f){$('hashMsg').textContent='Choose an evidence file first.';return}try{$('hashMsg').textContent='Calculating SHA-256…';let hash=await sha256(f);evidence.push({id:'EVD-'+String(evidence.length+1).padStart(3,'0'),name:f.name,size:f.size,description:$('evidenceDesc').value||'No description supplied',date:new Date().toLocaleString(),hash});renderAll();$('hashMsg').textContent='Evidence registered and SHA-256 calculated successfully.'}catch(e){$('hashMsg').textContent=e.message}}
+function csvDownload(name,rows){let csv=rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
+function exportEvents(){csvDownload('dfir_events.csv',[['timestamp','ip','username','status'],...events.map(e=>[e.timestamp,e.ip,e.username,e.status])])}
+function exportIncidents(){csvDownload('dfir_incidents.csv',[['id','type','ip','failed_attempts','severity','status'],...incidents.map(i=>[i.id,i.type,i.ip,i.count,i.severity,i.status])])}
+function downloadSample(){let data='timestamp,ip,username,status\n2026-10-30 09:00:01,192.0.2.10,alice,Success\n2026-10-30 09:02:11,198.51.100.23,admin,Failed\n2026-10-30 09:02:15,198.51.100.23,admin,Failed\n2026-10-30 09:02:19,198.51.100.23,admin,Failed\n2026-10-30 09:02:23,198.51.100.23,admin,Failed\n2026-10-30 09:02:27,198.51.100.23,admin,Failed\n2026-10-30 09:04:00,192.0.2.10,alice,Success\n';let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'text/csv'}));a.download='sample_security_logs.csv';a.click();URL.revokeObjectURL(a.href)}
+function printReport(){let name=$('investigator').value||'Not provided',ref=$('caseRef').value||'Not assigned',notes=$('notes').value||'No additional notes supplied.';let w=window.open('','_blank');if(!w){alert('Allow pop-ups for this page to generate the report, or use your browser share/print menu.');return}w.document.write(`<html><head><title>DFIR Investigation Report</title><style>body{font:14px Arial;margin:35px;color:#172033}h1{color:#153e68}table{width:100%;border-collapse:collapse;margin:16px 0}td,th{border:1px solid #ccd4df;padding:8px;text-align:left}th{background:#eef3f8}.muted{color:#58677b}.hash{word-break:break-all;font-size:10px}</style></head><body><h1>DFIR Sentinel — Investigation Report</h1><p class="muted">Academic demonstration report · Generated ${new Date().toLocaleString()}</p><p><b>Investigator:</b> ${escapeHTML(name)}<br><b>Case reference:</b> ${escapeHTML(ref)}</p><h2>Executive summary</h2><p>${events.length} log events analysed; ${incidents.length} potential incident(s) detected; ${evidence.length} evidence item(s) registered.</p><h2>Detected incidents</h2><table><tr><th>ID</th><th>Type</th><th>Source IP</th><th>Attempts</th><th>Severity</th><th>Status</th></tr>${incidents.map(i=>`<tr><td>${i.id}</td><td>${escapeHTML(i.type)}</td><td>${escapeHTML(i.ip)}</td><td>${i.count}</td><td>${i.severity}</td><td>${i.status}</td></tr>`).join('')}</table><h2>Evidence register</h2><table><tr><th>ID / File</th><th>Description</th><th>SHA-256</th></tr>${evidence.map(e=>`<tr><td>${e.id}<br>${escapeHTML(e.name)}</td><td>${escapeHTML(e.description)}</td><td class="hash">${e.hash}</td></tr>`).join('')}</table><h2>Investigation notes</h2><p>${escapeHTML(notes).replace(/\n/g,'<br>')}</p><h2>Method and limitations</h2><p>Detection uses a demonstration rule of five or more failed login attempts from one IP in the supplied dataset. Findings are leads for further investigation, not proof of compromise. Hashes support integrity comparison but do not establish authenticity or chain of custody. This prototype is not a forensic-grade acquisition tool.</p><script>window.onload=()=>window.print()<\/script></body></html>`);w.document.close()}
+renderAll();
+</script>
+</body></html>
